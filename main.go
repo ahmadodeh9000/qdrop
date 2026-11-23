@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -11,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"sync"
 
 	qrcode "github.com/skip2/go-qrcode"
 )
@@ -28,32 +26,30 @@ func getInviteToken() string {
 }
 
 // serving a file
-func serveFile(ln net.Listener, path, name string, t string) error {
+func serveFile(ln net.Listener, path, name string, t string)  {
 	mux := http.NewServeMux()
-	done := make(chan struct{})
-	var once sync.Once
+	//done := make(chan struct{})
+	//var once sync.Once
 
 	mux.HandleFunc("/"+t, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.Header().Set("Content-Disposition",
 			mime.FormatMediaType("attachment", map[string]string{"filename": name}))
 		http.ServeFile(w, r, path)
-		once.Do(func() { close(done) })
 	})
 
 	// when da file is downloaded it shuts down
-	srv := &http.Server{Handler: mux}
-	go func() {
-		<-done
-		fmt.Println("FILE HAS BEEN DOWNLOADED !")
-		srv.Shutdown(context.Background())
-	}()
+	//srv := &http.Server{Handler: mux}
+	//go func() {
+	//	<-done
+	//	fmt.Println("FILE HAS BEEN DOWNLOADED !")
+	//	srv.Shutdown(context.Background())
+	//}()
 
-	if err := srv.Serve(ln); err != http.ErrServerClosed {
-		return err
-	}
+	//if err := srv.Serve(ln); err != http.ErrServerClosed {
+	//	return err
+	//}
 
-	return nil
 }
 
 // getting local ip addr
