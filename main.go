@@ -34,6 +34,7 @@ func serveFile(ln net.Listener, path, name string, t string) error {
 	var once sync.Once
 
 	mux.HandleFunc("/"+t, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/octet-stream")
 		w.Header().Set("Content-Disposition",
 			mime.FormatMediaType("attachment", map[string]string{"filename": name}))
 		http.ServeFile(w, r, path)
