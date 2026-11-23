@@ -26,10 +26,8 @@ func getInviteToken() string {
 }
 
 // serving a file
-func serveFile(ln net.Listener, path, name string, t string)  {
+func serveFile(ln net.Listener, path, name string, t string) error {
 	mux := http.NewServeMux()
-	//done := make(chan struct{})
-	//var once sync.Once
 
 	mux.HandleFunc("/"+t, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/octet-stream")
@@ -38,18 +36,8 @@ func serveFile(ln net.Listener, path, name string, t string)  {
 		http.ServeFile(w, r, path)
 	})
 
-	// when da file is downloaded it shuts down
-	//srv := &http.Server{Handler: mux}
-	//go func() {
-	//	<-done
-	//	fmt.Println("FILE HAS BEEN DOWNLOADED !")
-	//	srv.Shutdown(context.Background())
-	//}()
-
-	//if err := srv.Serve(ln); err != http.ErrServerClosed {
-	//	return err
-	//}
-
+	fmt.Println("serving... press Ctrl+C to stop")
+	return http.Serve(ln, mux)
 }
 
 // getting local ip addr
